@@ -46,6 +46,10 @@ GRANT CREATE STREAM              ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROL
 GRANT CREATE MATERIALIZED VIEW   ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
 GRANT CREATE FILE FORMAT         ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
 GRANT CREATE TAG                 ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
+GRANT CREATE EXTERNAL TABLE      ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
+GRANT CREATE PIPE                ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
+GRANT CREATE STAGE               ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
+GRANT CREATE TASK                ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROLE IDENTIFIER ($poc_owner_role);
 
-
+GRANT MONITOR ON DATABASE IDENTIFIER ($poc_database) TO ROLE IDENTIFIER ($poc_owner_role);
 

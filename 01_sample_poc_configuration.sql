@@ -53,3 +53,22 @@ GRANT CREATE TASK                ON SCHEMA IDENTIFIER ($poc_owner_schema) TO ROL
 
 GRANT MONITOR ON DATABASE IDENTIFIER ($poc_database) TO ROLE IDENTIFIER ($poc_owner_role);
 
+CREATE USER SANJEETS
+    LOGIN_NAME = 'SANJEETS'
+    DISPLAY_NAME = 'SANJEET'
+    FIRST_NAME = 'SANJEET'
+    LAST_NAME = 'SHUKLA'
+    DEFAULT_WAREHOUSE = 'POC_WH'
+    PASSWORD = '********'
+    DEFAULT_ROLE = poc_owner_role
+    EMAIL = 'san#######00@gmail.com'
+    comment = "POC Admin"
+    must_change_password = true;
+
+
+# Common PITFALLS
+
+You may mitigate risk and limit your exposure by provisioning Sandpit accounts using Snowflake trial accounts found here: https://signup.snowflake.com/. The
+challenges of using free trial accounts are self-evident; there are no proper controls, or accountability, for usage and you put your organization’s reputation at risk.
+
+

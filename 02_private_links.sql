@@ -79,11 +79,6 @@ SELECT system$get_privatelink_authorized_endpoints();
 
 
 
-
-
-
-
-
 USE ROLE accountadmin;
 SELECT REPLACE ( value:endpointId,     '"' ) AS AccountID,
        REPLACE ( value:endpointIdType, '"' ) AS CSP
@@ -92,6 +87,33 @@ FROM   TABLE (
      )
              );
 
+
+
+-- Configuring AWS VPC endpoint
+USE ROLE accountadmin;
+SELECT REPLACE ( value, '"' ) AS privatelink_vpce_id
+FROM   TABLE (
+          FLATTEN (
+                  input => parse_json(system$get_privatelink_config())
+                  )
+             )
+WHERE  key = 'privatelink-vpce-id';
+
+-- The private link vpc id may look like com.amazonaws.vpce.eu-west-2.vpce-svc-0839061a5300e5ac1
+-- You can use private link account url to get private link vpc id as shown below. 
+
+
+SELECT current_region();
+
+
+USE ROLE accountadmin;
+SELECT REPLACE ( value, '"' ) AS privatelink_vpce_id
+FROM   TABLE (
+          FLATTEN (
+                  input => parse_json(system$get_privatelink_config())
+                  )
+             )
+WHERE  key = 'privatelink-account-url';
 
 
 

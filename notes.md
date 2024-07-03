@@ -33,5 +33,5 @@ This part relies on AWS-supplied policies for CloudShell (AWS CloudShellFullAcce
 - Step-2 Creating IAM User, snowflake_private_link_user
 	- Allow Programmatic access and AWS management console access.
 	- In the permission assign following permissions
-	- AWSCLousShellFullAccess, AmazonEC2FullAccess, snowflake_private_link_policy 
+	- `AWSCLousShellFullAccess`, `AmazonEC2FullAccess`, `snowflake_private_link_policy` 
 

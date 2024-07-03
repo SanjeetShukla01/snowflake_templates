@@ -8,7 +8,13 @@ This part relies on AWS-supplied policies for CloudShell (AWS CloudShellFullAcce
 
 - Begin by searching within AWS console for IAM, select Policies, and then click Create Policy.
 - In the policy Json box paste this json for STS policy.
-```json
+
+## Steps Writedown
+- Step-1 Create STS Profile
+	- IAM, select Policies, and then click Create Policy.
+	- In the policy Json box paste this json for STS policy.
+	- Name the policy as snowflake_private_link_policy
+```
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -22,15 +28,8 @@ This part relies on AWS-supplied policies for CloudShell (AWS CloudShellFullAcce
             "Resource": "*"
         }
     ]
-}
+}	
 ```
-
-## Steps Writedown
-- Step-1 Create STS Profile
-	- IAM, select Policies, and then click Create Policy.
-	- In the policy Json box paste this json for STS policy.
-	
-	- Name the policy as snowflake_private_link_policy
 - Step-2 Creating IAM User, snowflake_private_link_user
 	- Allow Programmatic access and AWS management console access.
 	- In the permission assign following permissions

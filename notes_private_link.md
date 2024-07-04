@@ -118,3 +118,13 @@ user/snowflake"
 		   REPLACE ( value:endpointIdType, '"' ) AS CSP
 	FROM TABLE (FLATTEN (input => parse_json(system$get_privatelink_authorized_endpoints())));
 ```
+
+You might also consider adding PrivateLink endpoint identification to your security
+monitoring to ensure no unauthorized endpoints have been added to your system
+configuration, noting the endpoints can be either AWS or Azure with GCP to follow:
+
+
+## SSO over Private Link
+SSO may be enabled for either public Internet access or for PrivateLink access. It is not
+possible to enable SSO for both public Internet access and PrivateLink access at the
+same time.

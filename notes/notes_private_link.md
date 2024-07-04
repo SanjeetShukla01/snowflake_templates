@@ -42,7 +42,7 @@ This part relies on AWS-supplied policies for CloudShell (AWS CloudShellFullAcce
 	- export AWS_SECRET_ACCESS_KEY=<Your Secret Access Key Here>
 	- aws sts get-federation-token --name snowflake
   
-	![federation_token](images/federation_token.png)
+	![federation_token](../images/federation_token.png)
 
 - Step-4 Verify Private Link
 	- Verify private link in Snowflake using above information

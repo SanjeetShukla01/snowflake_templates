@@ -124,3 +124,9 @@ SELECT * FROM   v_tag_references;
 SELECT current_available_roles();
 
 
+-- Querying s3 files
+SELECT t.$1 FROM
+'@SNOWPIPE/log_path/raw_logs/sc_dump/2024/07/04/30/server-name-that-generates-logs/file_name.parquet'
+(file_format => 'PARQUET') t;
+
+

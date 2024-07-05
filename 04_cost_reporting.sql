@@ -221,6 +221,8 @@ USE ROLE accountadmin;
 SHOW DATABASES;
 ALTER DATABASE cost_reporting ENABLE REPLICATION TO ACCOUNTS NUYMCLU.NP62160;
 
+
+-- List all replication databases.
 SHOW REPLICATION DATABASES;
 
 
@@ -234,8 +236,119 @@ DATA_RETENTION_TIME_IN_DAYS = 90;
 ALTER DATABASE nuymclu_replication_tertiary_cost_reporting REFRESH;
 
 SELECT *
-FROM   nuymclu_replication_tertiary_cost_reporting.cost_owner.stg_metering_
-daily_history;
+FROM   nuymclu_replication_tertiary_cost_reporting.cost_owner.stg_metering_daily_history;
 
 
 
+CREATE TASK nuymclu_replication_tertiary_cost_reporting_task
+WAREHOUSE            = compute_wh
+SCHEDULE             = 'USING CRON 0 8 * * * GMT'
+USER_TASK_TIMEOUT_MS = 14400000
+AS
+ALTER DATABASE nuymclu_replication_tertiary_cost_reporting REFRESH;
+
+
+ALTER TASK nuymclu_replication_tertiary_cost_reporting_task RESUME;
+
+
+-- Check and confirm that task is scheduled
+SELECT timestampdiff ( second, current_timestamp, scheduled_time ) as
+next_run,
+       scheduled_time,
+       current_timestamp,
+       name,
+       state
+FROM   TABLE ( information_schema.task_history())
+ORDER BY completed_time DESC;
+
+
+
+--You should also examine the status information available for the last database refresh:
+SELECT phase_name,
+       result,
+       start_time,
+       end_time,
+       details
+FROM TABLE ( information_schema.database_refresh_progress ( nuymclu_replication_tertiary_cost_reporting ));
+
+
+
+
+SELECT *
+FROM   nuymclu_replication_tertiary_cost_reporting.cost_owner.stg_metering_daily_history;
+
+
+
+--Creating Consumption Metrics Objects
+
+CREATE OR REPLACE TABLE cms_metering_daily_history
+(
+spoke_name          VARCHAR ( 255 ) NOT NULL,
+current_region      VARCHAR ( 30  ) NOT NULL,
+current_account     VARCHAR ( 30  ) NOT NULL,
+service_type        VARCHAR ( 30  ) NOT NULL,
+usage_date          DATE,
+credits_billed      NUMBER ( 38, 10 ),
+extract_timestamp   TIMESTAMP_LTZ  NOT NULL,
+ingest_timestamp    TIMESTAMP_LTZ  DEFAULT current_timestamp() NOT NULL
+);
+
+
+-- Create a stream.
+CREATE STREAM strm_nuymclu_replication_tertiary_cost_reporting_metering_daily_history
+ON TABLE nuymclu_replication_tertiary_cost_reporting.cost_owner.stg_metering_daily_history;
+
+
+
+-- Create a task
+CREATE OR REPLACE TASK task_load_nuymclu_replication_tertiary_cost_reporting_metering_daily_history
+WAREHOUSE = cms_wh
+SCHEDULE  = '5 minute'
+WHEN system$stream_has_data ( 'strm_nuymclu_replication_tertiary_cost_reporting_metering_daily_history' )
+AS
+INSERT INTO cms_metering_daily_history
+SELECT 'nuymclu_replication_tertiary_cost_reporting_metering_daily_
+history',
+       current_region,
+       current_account,
+       service_type,
+       usage_date,
+       credits_billed,
+       extract_timestamp,
+       current_timestamp()
+FROM  strm_nuymclu_replication_tertiary_cost_reporting_metering_daily_
+history;
+
+
+ALTER TASK task_load_nuymclu_replication_tertiary_cost_reporting_metering_daily_history RESUME;
+
+
+
+
+CREATE OR REPLACE VIEW v_cms_monthly_metering_daily_history
+AS
+SELECT spoke_name,
+       current_region()  AS current_region,
+       current_account() AS current_account,
+       service_type,
+       DECODE ( EXTRACT ( 'month', usage_date ),
+                          1,  'January',
+                          2,  'February',
+                          3,  'March',
+                          4,  'April',
+                          5,  'May',
+                          6,  'June',
+                          7,  'July',
+                          8,  'August',
+                          9,  'September',
+                          10, 'October',
+                          11, 'November',
+                          12, 'December')  AS month_of_year,
+       TO_CHAR ( DATE_PART ( 'year', usage_date ))   AS billing_year,
+       SUM   ( credits_billed ) AS sum_credits_billed,
+       current_timestamp()      AS extract_timestamp
+FROM   cms_metering_daily_history
+GROUP BY spoke_name,
+         service_type,
+         DATE_PART ( 'Month', usage_date ),
+         DATE_PART ( 'year',  usage_date );

@@ -42,3 +42,4 @@ SET TAG PII_N_Gender = 'Personally Identifiable Information -> Non-­
 Sensitive -> Gender';
 
 
+Integrating Object Tags and Object Access:
